@@ -1,0 +1,32 @@
+#game-container {
+  position: relative;
+  /* border: 10px solid slateblue; */
+  background-color: #caa1b5;
+  width: 600px;
+  height: 600px;
+  margin: 40px auto;
+}
+
+.node {
+
+  position: absolute;
+  width: 20px;
+  height: 20px;
+}
+
+.node.node-head {
+  background-image: url('./images/head.png');
+  background-position: -1px 0;
+  background-size: cover;
+}
+.node.node-food {
+  background-image: url('./images/food.png');
+  background-position: -1px 0;
+  background-size: cover;
+}
+.node.node-body {
+  background-color: #FFBB5C;
+  border-radius: 8px;
+  border: 2px solid #000;
+  box-sizing: border-box;
+}
