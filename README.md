@@ -1,25 +1,31 @@
-## Greedy Snake 贪吃蛇
+# Greedy Snake 贪吃蛇
 
-基于原生 `js` 
+基于原生 `js`
+
 采用面向对象编程思想
+
 部分 `ES6+` 语法
 
-思路整理
+## 思路整理
 
-全局配置
+  页面布局样式相关的东西比较简单，
 
-```javascript
+### 全局配置
 
-```
+  行数、列数、节点宽高、移动速度等
 
+### Classes
 
+- 节点 Node:
+  用于创建蛇身体每一部分的组成元素，以及食物
+  x: 水平位置
+  y: 垂直位置
+  type: head / body / food
 
+- 蛇 Snake:
+  存储蛇相关信息
+  处理移动等逻辑
 
-
-构造函数
-
-- Node:
-
-  types: head, body, tail, food
-
-- Snake
+- 游戏 Game:
+  用于控制游戏整体逻辑
+  初始化、开始、暂停、结束等
