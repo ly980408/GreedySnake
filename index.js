@@ -150,6 +150,7 @@ class Snake {
 
     // move
     console.log('move')
+    // todo
     // 把当前头部所在位置变为身体
 
     // 新生成一个头部
