@@ -22,6 +22,7 @@ const GAME_CONFIG = {
 const GAME_CONTAINER = document.getElementById('game-container')
 const GAME_START_BUTTON = document.getElementById('start-btn')
 const GAME_PAUSE_BUTTON = document.getElementById('pause-btn')
+const SCORE_DISPLAY = document.getElementById('score')
 
 /**
  * @description 节点
@@ -55,19 +56,16 @@ class Node {
   remove() {
     GAME_CONTAINER.removeChild(this.el)
   }
-
-  // 复用已存在的 Node 实例
-  // 避免重复创建/删除实例及其对应的 DOM 元素
-  reset(x, y, type) {
+  changePos(x, y) {
     this.x = x
     this.y = y
     const left = this.x * GAME_CONFIG.nodeW
     const top = this.y * GAME_CONFIG.nodeH
-    if (type) {
-      this.type = type
-      el.setAttribute('class', `node node-${this.type}`)
-    }
     this.el.setAttribute('style', `top:${top}px;left:${left}px;`)
+  }
+  changeType(type) {
+    this.type = type
+    this.el.setAttribute('class', `node node-${this.type}`)
   }
 }
 
@@ -97,7 +95,7 @@ function createNode (x, y, type) {
   if (!food) {
     food = createNode(x, y, 'food')
   } else {
-    food.reset(x, y)
+    food.changePos(x, y)
   }
 }
 
@@ -118,6 +116,7 @@ class Snake {
     const body = createNode(1, 0, 'body')
     const tail = createNode(0, 0, 'body')
 
+    // 维护各节点间相对位置关系链表
     head.next = body
     body.prev = head
     body.next = tail
@@ -147,15 +146,37 @@ class Snake {
       return game.over('猪撞树上了，你撞墙上了～')
     }
     // 3. 吃到食物
+    let gotFood = food && food.x === newX && food.y === newY
+    if (gotFood) {
+      game.updateScore()
+      createFood()
+    }
 
-    // move
-    console.log('move')
-    // todo
+    // 移动的原理：
+    // 蛇的移动其实就是蛇头部的移动
+    // 移动时，生成一个新头，添加到身体最前端，然后弹出最后一个元素（即尾部），这样不断进行变化，就实现了蛇的移动
+
     // 把当前头部所在位置变为身体
-
-    // 新生成一个头部
+    const oldHead = this.head
+    oldHead.changeType('body')
+    // 新生成一个头部，赋值给 this.head
+    // 并将其添加到 this.nodes 数组
     const newHead = createNode(newX, newY, 'head')
+    newHead.next = oldHead
+    oldHead.prev = newHead
     this.head = newHead
+    this.nodes.unshift(newHead)
+
+    // 如果没有吃到食物，则删除当前尾部，将其前一个身体作为新的尾部
+    // 反之，不做处理
+    if (!gotFood) {
+      const newTail = this.tail.prev
+      this.tail.remove()
+      this.nodes.pop()
+      newTail.next = null
+      this.tail = newTail
+    }
+
   }
   changeDir(dir) {
     if (dir === dirAgainst[this.dir]) {
@@ -265,6 +286,14 @@ class Game {
 
     GAME_START_BUTTON.disabled = true
   }
+  updateScore(reset) {
+    if (reset) {
+      this.score = 0
+    } else {
+      this.score++
+    }
+    SCORE_DISPLAY.innerText = this.score
+  }
   pause() {
     clearInterval(this.timer)
     this.timer = null
@@ -272,6 +301,7 @@ class Game {
   }
   reset() {
     this.score = 0
+    this.updateScore(true)
     this.timer = null
     this.isGameOver = false
     GAME_CONTAINER.innerHTML = ''
